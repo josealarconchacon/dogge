@@ -12,7 +12,7 @@ const Header = () => {
       <div className="header-content">
         <div className="logo">
           <Link to="/builder">
-            <h1>🐕 Dogge Card</h1>
+            <h1>🐕 Dogge</h1>
           </Link>
         </div>
 

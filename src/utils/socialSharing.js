@@ -1,4 +1,3 @@
-// Social Media Sharing Utilities
 export const generateSocialMetaTags = (cardData, shareUrl) => {
   const title = `${cardData.providerInfo.name || "Pet Services"} - Dogge Card`;
   const description = cardData.services
