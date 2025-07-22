@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDoggeCard } from "../context/DoggeCardContext";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, Save } from "lucide-react";
 import { generateShareableImage, downloadImage } from "../utils/imageGenerator";
 
 const Preview = () => {
   const navigate = useNavigate();
-  const { state } = useDoggeCard();
+  const { state, saveCard } = useDoggeCard();
   const { currentCard } = state;
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const handleDownloadImage = async () => {
     try {
@@ -21,6 +22,19 @@ const Preview = () => {
       alert("Failed to download image. Please try again.");
     } finally {
       setGeneratingImage(false);
+    }
+  };
+
+  const handleSaveCard = async () => {
+    try {
+      setSaving(true);
+      saveCard();
+      alert("Card saved successfully!");
+    } catch (err) {
+      console.error("Failed to save card:", err);
+      alert("Failed to save card. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -40,6 +54,14 @@ const Preview = () => {
           >
             <Download size={16} />
             Download Image
+          </button>
+          <button
+            onClick={handleSaveCard}
+            className="save-btn"
+            disabled={saving}
+          >
+            <Save size={16} />
+            Save Card
           </button>
         </div>
       </div>

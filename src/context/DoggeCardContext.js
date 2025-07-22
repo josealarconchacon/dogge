@@ -167,6 +167,20 @@ const doggeCardReducer = (state, action) => {
         currentCard: { ...initialState.currentCard, id: null },
       };
 
+    case "CLEAR_SAVED_CARDS":
+      return {
+        ...state,
+        savedCards: [],
+      };
+
+    case "DELETE_CARD":
+      return {
+        ...state,
+        savedCards: state.savedCards.filter(
+          (card) => card.id !== action.payload
+        ),
+      };
+
     default:
       return state;
   }
@@ -217,6 +231,8 @@ export const DoggeCardProvider = ({ children }) => {
     saveCard: () => dispatch({ type: "SAVE_CARD" }),
     loadCard: (card) => dispatch({ type: "LOAD_CARD", payload: card }),
     resetCard: () => dispatch({ type: "RESET_CARD" }),
+    clearSavedCards: () => dispatch({ type: "CLEAR_SAVED_CARDS" }),
+    deleteCard: (cardId) => dispatch({ type: "DELETE_CARD", payload: cardId }),
   };
 
   return (

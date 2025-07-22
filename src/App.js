@@ -9,6 +9,7 @@ import "./App.css";
 import Header from "./components/Header";
 import FormBuilder from "./components/FormBuilder";
 import Preview from "./components/Preview";
+import SavedCards from "./components/SavedCards";
 import Share from "./components/Share";
 import { DoggeCardProvider } from "./context/DoggeCardContext";
 
@@ -28,6 +29,7 @@ function App() {
               <Route path="/" element={<Navigate to="/builder" replace />} />
               <Route path="/builder" element={<FormBuilder />} />
               <Route path="/preview" element={<Preview />} />
+              <Route path="/saved" element={<SavedCards />} />
               <Route path="/share/:cardId" element={<Share />} />
             </Routes>
           </main>
