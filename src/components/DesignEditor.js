@@ -6,6 +6,10 @@ const DesignEditor = () => {
   const { design } = state.currentCard;
 
   const handleColorChange = (colorType, value) => {
+    if (value && !/^#[0-9A-F]{6}$/i.test(value)) {
+      alert("Please enter a valid hex color code (e.g., #FF0000)");
+      return;
+    }
     updateDesign({ [colorType]: value });
   };
 

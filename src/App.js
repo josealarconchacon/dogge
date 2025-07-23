@@ -31,6 +31,7 @@ function App() {
               <Route path="/preview" element={<Preview />} />
               <Route path="/saved" element={<SavedCards />} />
               <Route path="/share/:cardId" element={<Share />} />
+              <Route path="*" element={<Navigate to="/builder" replace />} />
             </Routes>
           </main>
         </div>

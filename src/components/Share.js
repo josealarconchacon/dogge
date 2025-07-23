@@ -25,9 +25,13 @@ const Share = () => {
   });
 
   // Find the card by ID
-  const card =
-    state.savedCards.find((c) => c.id === cardId) || state.currentCard;
-  const shareUrl = `${window.location.origin}/share/${cardId}`;
+  const card = cardId
+    ? state.savedCards.find((c) => c.id === cardId)
+    : state.currentCard;
+
+  const shareUrl = cardId
+    ? `${window.location.origin}/share/${cardId}`
+    : window.location.href;
 
   // Update meta tags when component mounts
   useEffect(() => {

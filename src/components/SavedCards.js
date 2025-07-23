@@ -37,16 +37,12 @@ const SavedCards = () => {
   const handleDeleteCard = (cardId) => {
     if (window.confirm("Are you sure you want to delete this card?")) {
       deleteCard(cardId);
-      // Update localStorage
-      const updatedCards = savedCards.filter((card) => card.id !== cardId);
-      localStorage.setItem("doggeSavedCards", JSON.stringify(updatedCards));
     }
   };
 
   const handleClearAllCards = () => {
     if (window.confirm("Are you sure you want to delete all saved cards?")) {
       clearSavedCards();
-      localStorage.removeItem("doggeSavedCards");
       navigate("/builder");
     }
   };
@@ -153,15 +149,8 @@ const SavedCards = () => {
 };
 
 const DoggeCardDisplay = ({ card }) => {
-  const {
-    design,
-    providerInfo,
-    services,
-    holidayRate,
-    targetAudience,
-    generalInclusions,
-    optionalSections,
-  } = card;
+  const { design, providerInfo, services, targetAudience, generalInclusions } =
+    card;
 
   return (
     <div

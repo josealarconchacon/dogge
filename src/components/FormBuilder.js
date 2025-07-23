@@ -35,6 +35,14 @@ const FormBuilder = () => {
     setEditingService(newService.id);
   };
 
+  const handleRemoveService = (serviceId) => {
+    removeService(serviceId);
+    // If we're editing the service that's being removed, close the editor
+    if (editingService === serviceId) {
+      setEditingService(null);
+    }
+  };
+
   const handlePreview = () => {
     navigate("/preview");
   };
@@ -98,7 +106,7 @@ const FormBuilder = () => {
                           <Settings size={14} />
                         </button>
                         <button
-                          onClick={() => removeService(service.id)}
+                          onClick={() => handleRemoveService(service.id)}
                           className="delete-btn"
                         >
                           <Trash2 size={14} />

@@ -1,9 +1,10 @@
 export const generateSocialMetaTags = (cardData, shareUrl) => {
-  const title = `${cardData.providerInfo.name || "Pet Services"} - Dogge Card`;
-  const description = cardData.services
-    .map((s) => `${s.name}: $${s.basePrice}`)
-    .join(", ");
-  const imageUrl = `${window.location.origin}/api/card-image/${cardData.id}`; // This would be your backend endpoint
+  const title = `${cardData.providerInfo?.name || "Pet Services"} - Dogge Card`;
+  const description =
+    cardData.services && cardData.services.length > 0
+      ? cardData.services.map((s) => `${s.name}: $${s.basePrice}`).join(", ")
+      : "Professional pet care services available";
+  const imageUrl = `${window.location.origin}/api/card-image/${cardData.id}`; // backend endpoint
 
   return {
     title,
@@ -15,7 +16,6 @@ export const generateSocialMetaTags = (cardData, shareUrl) => {
 };
 
 export const updatePageMetaTags = (metaData) => {
-  // Update or create meta tags for social sharing
   const updateMetaTag = (property, content) => {
     let meta = document.querySelector(`meta[property="${property}"]`);
     if (!meta) {
@@ -62,9 +62,6 @@ export const shareToSocialMedia = async (cardData, shareUrl) => {
     // Generate the card image
     const { generateShareableImage } = await import("./imageGenerator");
     const imageBlob = await generateShareableImage(cardData);
-
-    // For a full implementation, you would upload this image to your server
-    // and get a public URL. For now, we'll provide instructions.
 
     const instructions = `
 To enable full social media preview functionality:

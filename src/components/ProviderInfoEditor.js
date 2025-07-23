@@ -11,6 +11,13 @@ const ProviderInfoEditor = () => {
   const { providerInfo } = state.currentCard;
 
   const handleChange = (field, value) => {
+    if (field === "year") {
+      const yearValue = parseInt(value) || new Date().getFullYear();
+      if (yearValue < 2020 || yearValue > 2030) {
+        alert("Please enter a valid year between 2020 and 2030");
+        return;
+      }
+    }
     updateProviderInfo({ [field]: value });
   };
 

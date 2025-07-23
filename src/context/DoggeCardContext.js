@@ -181,6 +181,12 @@ const doggeCardReducer = (state, action) => {
         ),
       };
 
+    case "LOAD_SAVED_CARDS":
+      return {
+        ...state,
+        savedCards: action.payload,
+      };
+
     default:
       return state;
   }
@@ -194,10 +200,14 @@ export const DoggeCardProvider = ({ children }) => {
     const savedCards = localStorage.getItem("doggeSavedCards");
 
     if (savedCards) {
-      const parsedCards = JSON.parse(savedCards);
-      parsedCards.forEach((card) => {
-        dispatch({ type: "SAVE_CARD", payload: card });
-      });
+      try {
+        const parsedCards = JSON.parse(savedCards);
+        dispatch({ type: "LOAD_SAVED_CARDS", payload: parsedCards });
+      } catch (error) {
+        console.error("Error loading saved cards:", error);
+        // Clear corrupted data
+        localStorage.removeItem("doggeSavedCards");
+      }
     }
   }, []);
 

@@ -64,6 +64,18 @@ const OptionalSectionsEditor = () => {
     updateOptionalSection("testimonials", { items: updatedItems });
   };
 
+  const handleUpdateAvailability = (day, status) => {
+    const updatedSchedule = {
+      ...optionalSections.availability.schedule,
+      [day]: status,
+    };
+    updateOptionalSection("availability", { schedule: updatedSchedule });
+  };
+
+  const getAvailabilityStatus = (day) => {
+    return optionalSections.availability.schedule[day] || "Available";
+  };
+
   return (
     <div className="editor-section">
       <div className="section-header">
@@ -214,10 +226,16 @@ const OptionalSectionsEditor = () => {
                       ].map((day) => (
                         <div key={day} className="schedule-day">
                           <label>{day}</label>
-                          <select className="form-select">
-                            <option>Available</option>
-                            <option>Limited</option>
-                            <option>Unavailable</option>
+                          <select
+                            value={getAvailabilityStatus(day)}
+                            onChange={(e) =>
+                              handleUpdateAvailability(day, e.target.value)
+                            }
+                            className="form-select"
+                          >
+                            <option value="Available">Available</option>
+                            <option value="Limited">Limited</option>
+                            <option value="Unavailable">Unavailable</option>
                           </select>
                         </div>
                       ))}

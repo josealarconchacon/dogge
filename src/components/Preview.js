@@ -11,7 +11,32 @@ const Preview = () => {
   const [generatingImage, setGeneratingImage] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Check if the card has meaningful content
+  const hasContent = () => {
+    const { providerInfo, services, targetAudience, generalInclusions } =
+      currentCard;
+
+    // Check if provider has basic info
+    const hasProviderInfo =
+      providerInfo.name && providerInfo.name.trim() !== "";
+
+    // Check if there are services
+    const hasServices = services && services.length > 0;
+
+    // Check if there's target audience or general inclusions
+    const hasAdditionalInfo =
+      (targetAudience && targetAudience.trim() !== "") ||
+      (generalInclusions && generalInclusions.trim() !== "");
+
+    return hasProviderInfo || hasServices || hasAdditionalInfo;
+  };
+
   const handleDownloadImage = async () => {
+    if (!hasContent()) {
+      alert("Please add some content to your card before downloading.");
+      return;
+    }
+
     try {
       setGeneratingImage(true);
       const imageBlob = await generateShareableImage(currentCard);
@@ -26,6 +51,11 @@ const Preview = () => {
   };
 
   const handleSaveCard = async () => {
+    if (!hasContent()) {
+      alert("Please add some content to your card before saving.");
+      return;
+    }
+
     try {
       setSaving(true);
       saveCard();
@@ -50,7 +80,7 @@ const Preview = () => {
           <button
             onClick={handleDownloadImage}
             className="action-btn"
-            disabled={generatingImage}
+            disabled={generatingImage || !hasContent()}
           >
             <Download size={16} />
             Download Image
@@ -58,7 +88,7 @@ const Preview = () => {
           <button
             onClick={handleSaveCard}
             className="save-btn"
-            disabled={saving}
+            disabled={saving || !hasContent()}
           >
             <Save size={16} />
             Save Card
@@ -67,9 +97,25 @@ const Preview = () => {
       </div>
 
       <div className="preview-content">
-        <div className="preview-card">
-          <DoggeCardDisplay card={currentCard} />
-        </div>
+        {hasContent() ? (
+          <div className="preview-card">
+            <DoggeCardDisplay card={currentCard} />
+          </div>
+        ) : (
+          <div className="empty-preview-state">
+            <h3>No Content to Preview</h3>
+            <p>
+              Your card is empty. Please add some content in the builder to see
+              a preview.
+            </p>
+            <button
+              onClick={() => navigate("/builder")}
+              className="btn-primary"
+            >
+              Go to Builder
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -85,6 +131,11 @@ const DoggeCardDisplay = ({ card }) => {
     generalInclusions,
     optionalSections,
   } = card;
+
+  // Don't render if no meaningful content
+  if (!providerInfo?.name?.trim() && (!services || services.length === 0)) {
+    return null;
+  }
 
   return (
     <div
@@ -116,165 +167,189 @@ const DoggeCardDisplay = ({ card }) => {
           PET SITTING SERVICES
         </h1>
         <p style={{ margin: "0", fontSize: "18px", opacity: "0.9" }}>
-          {providerInfo.year}
+          {providerInfo.year || new Date().getFullYear()}
         </p>
-        <p style={{ margin: "10px 0 0 0", fontSize: "14px" }}>
-          {providerInfo.name} {providerInfo.phone && `(${providerInfo.phone})`}
-          {providerInfo.apartment && ` - ${providerInfo.apartment}`}
-        </p>
+        {providerInfo.name && (
+          <p style={{ margin: "10px 0 0 0", fontSize: "14px" }}>
+            {providerInfo.name}{" "}
+            {providerInfo.phone && `(${providerInfo.phone})`}
+            {providerInfo.apartment && ` - ${providerInfo.apartment}`}
+          </p>
+        )}
       </div>
 
       {/* Services */}
-      <div className="card-services" style={{ padding: "20px" }}>
-        {services.map((service, index) => (
-          <div
-            key={service.id}
-            className="service-item"
-            style={{ marginBottom: "20px" }}
-          >
+      {services && services.length > 0 && (
+        <div className="card-services" style={{ padding: "20px" }}>
+          {services.map((service, index) => (
             <div
-              className="service-header"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
+              key={service.id}
+              className="service-item"
+              style={{ marginBottom: "20px" }}
             >
-              <span style={{ fontSize: "20px", marginRight: "10px" }}>
-                {service.icon}
-              </span>
-              <h3 style={{ margin: "0", fontSize: "18px", fontWeight: "bold" }}>
-                {service.name}
-              </h3>
-              <span
+              <div
+                className="service-header"
                 style={{
-                  marginLeft: "auto",
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  color: design.accentColor,
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "10px",
                 }}
               >
-                ${service.basePrice}
-              </span>
+                <span style={{ fontSize: "20px", marginRight: "10px" }}>
+                  {service.icon}
+                </span>
+                <h3
+                  style={{ margin: "0", fontSize: "18px", fontWeight: "bold" }}
+                >
+                  {service.name}
+                </h3>
+                <span
+                  style={{
+                    marginLeft: "auto",
+                    fontSize: "20px",
+                    fontWeight: "bold",
+                    color: design.accentColor,
+                  }}
+                >
+                  ${service.basePrice}
+                </span>
+              </div>
+
+              {service.includedFeature && (
+                <p
+                  style={{
+                    margin: "5px 0",
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                    color: design.accentColor,
+                  }}
+                >
+                  {service.includedFeature}
+                </p>
+              )}
+
+              <p
+                style={{ margin: "5px 0", fontSize: "14px", lineHeight: "1.4" }}
+              >
+                {service.description}
+              </p>
+
+              {service.specificTerms && (
+                <p
+                  style={{
+                    margin: "5px 0",
+                    fontSize: "12px",
+                    fontStyle: "italic",
+                    color: "#666",
+                  }}
+                >
+                  {service.specificTerms}
+                </p>
+              )}
+
+              {service.additionalPetPrice > 0 && (
+                <p
+                  style={{
+                    margin: "5px 0",
+                    fontSize: "12px",
+                    color: "#666",
+                  }}
+                >
+                  ADDITIONAL PET ({service.name}) ${service.additionalPetPrice}
+                </p>
+              )}
             </div>
-
-            {service.includedFeature && (
-              <p
-                style={{
-                  margin: "5px 0",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  color: design.accentColor,
-                }}
-              >
-                {service.includedFeature}
-              </p>
-            )}
-
-            <p style={{ margin: "5px 0", fontSize: "14px", lineHeight: "1.4" }}>
-              {service.description}
-            </p>
-
-            {service.specificTerms && (
-              <p
-                style={{
-                  margin: "5px 0",
-                  fontSize: "12px",
-                  fontStyle: "italic",
-                  color: "#666",
-                }}
-              >
-                {service.specificTerms}
-              </p>
-            )}
-
-            {service.additionalPetPrice > 0 && (
-              <p
-                style={{
-                  margin: "5px 0",
-                  fontSize: "12px",
-                  color: "#666",
-                }}
-              >
-                ADDITIONAL PET ({service.name}) ${service.additionalPetPrice}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Holiday Rate */}
-      {holidayRate.enabled && (
+      {holidayRate &&
+        holidayRate.enabled &&
+        holidayRate.dates &&
+        holidayRate.dates.length > 0 && (
+          <div
+            className="holiday-section"
+            style={{
+              backgroundColor: design.primaryColor,
+              color: "white",
+              padding: "15px 20px",
+            }}
+          >
+            <h3 style={{ margin: "0 0 10px 0", fontSize: "16px" }}>
+              HOLIDAY RATE
+            </h3>
+            <p style={{ margin: "0 0 10px 0", fontSize: "14px" }}>
+              Additional charge for holidays: +${holidayRate.additionalCharge}
+            </p>
+            <div style={{ fontSize: "12px", opacity: "0.9" }}>
+              {holidayRate.dates.map((date, index) => (
+                <span
+                  key={index}
+                  style={{ display: "block", marginBottom: "2px" }}
+                >
+                  {date}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+      {/* Footer */}
+      {(targetAudience || generalInclusions) && (
         <div
-          className="holiday-section"
+          className="card-footer"
           style={{
             backgroundColor: design.primaryColor,
             color: "white",
-            padding: "15px 20px",
+            padding: "20px",
+            textAlign: "center",
           }}
         >
-          <h3 style={{ margin: "0 0 10px 0", fontSize: "16px" }}>
-            HOLIDAY RATE
-          </h3>
-          <p style={{ margin: "0 0 10px 0", fontSize: "14px" }}>
-            Additional charge for holidays: +${holidayRate.additionalCharge}
-          </p>
-          <div style={{ fontSize: "12px", opacity: "0.9" }}>
-            {holidayRate.dates.map((date, index) => (
-              <span
-                key={index}
-                style={{ display: "block", marginBottom: "2px" }}
-              >
-                {date}
-              </span>
-            ))}
-          </div>
+          {targetAudience && (
+            <div
+              style={{
+                backgroundColor: design.accentColor,
+                color: "white",
+                padding: "8px 16px",
+                borderRadius: "20px",
+                display: "inline-block",
+                marginBottom: "10px",
+                fontSize: "12px",
+                fontWeight: "bold",
+              }}
+            >
+              {targetAudience}
+            </div>
+          )}
+          {generalInclusions && (
+            <p style={{ margin: "0", fontSize: "12px", opacity: "0.9" }}>
+              {generalInclusions}
+            </p>
+          )}
         </div>
       )}
-
-      {/* Footer */}
-      <div
-        className="card-footer"
-        style={{
-          backgroundColor: design.primaryColor,
-          color: "white",
-          padding: "20px",
-          textAlign: "center",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: design.accentColor,
-            color: "white",
-            padding: "8px 16px",
-            borderRadius: "20px",
-            display: "inline-block",
-            marginBottom: "10px",
-            fontSize: "12px",
-            fontWeight: "bold",
-          }}
-        >
-          {targetAudience}
-        </div>
-        <p style={{ margin: "0", fontSize: "12px", opacity: "0.9" }}>
-          {generalInclusions}
-        </p>
-      </div>
 
       {/* Optional Sections */}
-      {optionalSections.about.enabled && optionalSections.about.content && (
-        <div
-          className="about-section"
-          style={{ padding: "20px", borderTop: "1px solid #eee" }}
-        >
-          <h3 style={{ margin: "0 0 10px 0", fontSize: "16px" }}>About Me</h3>
-          <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.4" }}>
-            {optionalSections.about.content}
-          </p>
-        </div>
-      )}
+      {optionalSections &&
+        optionalSections.about &&
+        optionalSections.about.enabled &&
+        optionalSections.about.content && (
+          <div
+            className="about-section"
+            style={{ padding: "20px", borderTop: "1px solid #eee" }}
+          >
+            <h3 style={{ margin: "0 0 10px 0", fontSize: "16px" }}>About Me</h3>
+            <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.4" }}>
+              {optionalSections.about.content}
+            </p>
+          </div>
+        )}
 
-      {optionalSections.testimonials.enabled &&
+      {optionalSections &&
+        optionalSections.testimonials &&
+        optionalSections.testimonials.enabled &&
+        optionalSections.testimonials.items &&
         optionalSections.testimonials.items.length > 0 && (
           <div
             className="testimonials-section"

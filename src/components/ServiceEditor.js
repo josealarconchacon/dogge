@@ -12,6 +12,19 @@ const ServiceEditor = ({ service, onSave, onCancel }) => {
   };
 
   const handleSave = () => {
+    // Validate required fields
+    if (!editedService.name.trim()) {
+      alert("Please enter a service name");
+      return;
+    }
+    if (editedService.basePrice < 0) {
+      alert("Base price cannot be negative");
+      return;
+    }
+    if (editedService.additionalPetPrice < 0) {
+      alert("Additional pet price cannot be negative");
+      return;
+    }
     onSave(editedService);
   };
 

@@ -12,11 +12,21 @@ const HolidayRateEditor = () => {
   };
 
   const handleAdditionalChargeChange = (value) => {
-    updateHolidayRate({ additionalCharge: parseInt(value) || 0 });
+    const charge = parseInt(value) || 0;
+    if (charge < 0) {
+      alert("Additional charge cannot be negative");
+      return;
+    }
+    updateHolidayRate({ additionalCharge: charge });
   };
 
   const handleAddDate = () => {
     if (newDate.trim()) {
+      // Check for duplicate dates
+      if (holidayRate.dates.includes(newDate.trim())) {
+        alert("This date range is already added");
+        return;
+      }
       updateHolidayRate({
         dates: [...holidayRate.dates, newDate.trim()],
       });
