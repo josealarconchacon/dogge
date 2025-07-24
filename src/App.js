@@ -16,12 +16,7 @@ import { DoggeCardProvider } from "./context/DoggeCardContext";
 function App() {
   return (
     <DoggeCardProvider>
-      <Router
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
+      <Router>
         <div className="App">
           <Header />
           <main className="main-content">

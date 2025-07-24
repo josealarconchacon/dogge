@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDoggeCard } from "../context/DoggeCardContext";
-import { ArrowLeft, Download, Save } from "lucide-react";
+import { ArrowLeft, Download, Save, Eye } from "lucide-react";
 import { generateShareableImage, downloadImage } from "../utils/imageGenerator";
+import DoggeCardDisplay from "./DoggeCardDisplay";
 
 const Preview = () => {
   const navigate = useNavigate();
@@ -70,319 +71,68 @@ const Preview = () => {
 
   return (
     <div className="preview-page">
-      <div className="preview-header">
-        <button onClick={() => navigate("/builder")} className="back-btn">
-          <ArrowLeft size={20} />
-          Back to Builder
-        </button>
-        <h2>Preview Your Dogge Card</h2>
-        <div className="preview-actions">
-          <button
-            onClick={handleDownloadImage}
-            className="action-btn"
-            disabled={generatingImage || !hasContent()}
-          >
-            <Download size={16} />
-            Download Image
-          </button>
-          <button
-            onClick={handleSaveCard}
-            className="save-btn"
-            disabled={saving || !hasContent()}
-          >
-            <Save size={16} />
-            Save Card
-          </button>
-        </div>
-      </div>
-
-      <div className="preview-content">
-        {hasContent() ? (
-          <div className="preview-card">
-            <DoggeCardDisplay card={currentCard} />
-          </div>
-        ) : (
-          <div className="empty-preview-state">
-            <h3>No Content to Preview</h3>
-            <p>
-              Your card is empty. Please add some content in the builder to see
-              a preview.
-            </p>
-            <button
-              onClick={() => navigate("/builder")}
-              className="btn-primary"
-            >
-              Go to Builder
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const DoggeCardDisplay = ({ card }) => {
-  const {
-    design,
-    providerInfo,
-    services,
-    holidayRate,
-    targetAudience,
-    generalInclusions,
-    optionalSections,
-  } = card;
-
-  // Don't render if no meaningful content
-  if (!providerInfo?.name?.trim() && (!services || services.length === 0)) {
-    return null;
-  }
-
-  return (
-    <div
-      className="dogge-card"
-      style={{
-        backgroundColor: design.secondaryColor,
-        color: "#333",
-        fontFamily: "Arial, sans-serif",
-        maxWidth: "400px",
-        margin: "0 auto",
-        borderRadius: "12px",
-        overflow: "hidden",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-      }}
-    >
-      {/* Header */}
-      <div
-        className="card-header"
-        style={{
-          backgroundColor: design.primaryColor,
-          color: "white",
-          padding: "20px",
-          textAlign: "center",
-        }}
-      >
-        <h1
-          style={{ margin: "0 0 5px 0", fontSize: "24px", fontWeight: "bold" }}
-        >
-          PET SITTING SERVICES
-        </h1>
-        <p style={{ margin: "0", fontSize: "18px", opacity: "0.9" }}>
-          {providerInfo.year || new Date().getFullYear()}
-        </p>
-        {providerInfo.name && (
-          <p style={{ margin: "10px 0 0 0", fontSize: "14px" }}>
-            {providerInfo.name}{" "}
-            {providerInfo.phone && `(${providerInfo.phone})`}
-            {providerInfo.apartment && ` - ${providerInfo.apartment}`}
-          </p>
-        )}
-      </div>
-
-      {/* Services */}
-      {services && services.length > 0 && (
-        <div className="card-services" style={{ padding: "20px" }}>
-          {services.map((service, index) => (
-            <div
-              key={service.id}
-              className="service-item"
-              style={{ marginBottom: "20px" }}
-            >
-              <div
-                className="service-header"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "10px",
-                }}
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-12">
+            <div className="preview-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-5">
+              <button
+                onClick={() => navigate("/builder")}
+                className="btn btn-secondary d-flex align-items-center gap-2 px-3 py-2"
               >
-                <span style={{ fontSize: "20px", marginRight: "10px" }}>
-                  {service.icon}
-                </span>
-                <h3
-                  style={{ margin: "0", fontSize: "18px", fontWeight: "bold" }}
+                <ArrowLeft size={20} />
+                Back to Builder
+              </button>
+              <h2 className="h2 fw-bold text-center text-md-start mb-0">
+                Preview Your Dogge Card
+              </h2>
+              <div className="preview-actions d-flex flex-column flex-sm-row gap-2">
+                <button
+                  onClick={handleDownloadImage}
+                  className="btn btn-primary d-flex align-items-center gap-2 px-3 py-2"
+                  disabled={generatingImage || !hasContent()}
                 >
-                  {service.name}
-                </h3>
-                <span
-                  style={{
-                    marginLeft: "auto",
-                    fontSize: "20px",
-                    fontWeight: "bold",
-                    color: design.accentColor,
-                  }}
+                  <Download size={18} />
+                  {generatingImage ? "Generating..." : "Download Image"}
+                </button>
+                <button
+                  onClick={handleSaveCard}
+                  className="btn btn-success d-flex align-items-center gap-2 px-3 py-2"
+                  disabled={saving || !hasContent()}
                 >
-                  ${service.basePrice}
-                </span>
+                  <Save size={18} />
+                  {saving ? "Saving..." : "Save Card"}
+                </button>
               </div>
-
-              {service.includedFeature && (
-                <p
-                  style={{
-                    margin: "5px 0",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    color: design.accentColor,
-                  }}
-                >
-                  {service.includedFeature}
-                </p>
-              )}
-
-              <p
-                style={{ margin: "5px 0", fontSize: "14px", lineHeight: "1.4" }}
-              >
-                {service.description}
-              </p>
-
-              {service.specificTerms && (
-                <p
-                  style={{
-                    margin: "5px 0",
-                    fontSize: "12px",
-                    fontStyle: "italic",
-                    color: "#666",
-                  }}
-                >
-                  {service.specificTerms}
-                </p>
-              )}
-
-              {service.additionalPetPrice > 0 && (
-                <p
-                  style={{
-                    margin: "5px 0",
-                    fontSize: "12px",
-                    color: "#666",
-                  }}
-                >
-                  ADDITIONAL PET ({service.name}) ${service.additionalPetPrice}
-                </p>
-              )}
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Holiday Rate */}
-      {holidayRate &&
-        holidayRate.enabled &&
-        holidayRate.dates &&
-        holidayRate.dates.length > 0 && (
-          <div
-            className="holiday-section"
-            style={{
-              backgroundColor: design.primaryColor,
-              color: "white",
-              padding: "15px 20px",
-            }}
-          >
-            <h3 style={{ margin: "0 0 10px 0", fontSize: "16px" }}>
-              HOLIDAY RATE
-            </h3>
-            <p style={{ margin: "0 0 10px 0", fontSize: "14px" }}>
-              Additional charge for holidays: +${holidayRate.additionalCharge}
-            </p>
-            <div style={{ fontSize: "12px", opacity: "0.9" }}>
-              {holidayRate.dates.map((date, index) => (
-                <span
-                  key={index}
-                  style={{ display: "block", marginBottom: "2px" }}
-                >
-                  {date}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-      {/* Footer */}
-      {(targetAudience || generalInclusions) && (
-        <div
-          className="card-footer"
-          style={{
-            backgroundColor: design.primaryColor,
-            color: "white",
-            padding: "20px",
-            textAlign: "center",
-          }}
-        >
-          {targetAudience && (
-            <div
-              style={{
-                backgroundColor: design.accentColor,
-                color: "white",
-                padding: "8px 16px",
-                borderRadius: "20px",
-                display: "inline-block",
-                marginBottom: "10px",
-                fontSize: "12px",
-                fontWeight: "bold",
-              }}
-            >
-              {targetAudience}
-            </div>
-          )}
-          {generalInclusions && (
-            <p style={{ margin: "0", fontSize: "12px", opacity: "0.9" }}>
-              {generalInclusions}
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Optional Sections */}
-      {optionalSections &&
-        optionalSections.about &&
-        optionalSections.about.enabled &&
-        optionalSections.about.content && (
-          <div
-            className="about-section"
-            style={{ padding: "20px", borderTop: "1px solid #eee" }}
-          >
-            <h3 style={{ margin: "0 0 10px 0", fontSize: "16px" }}>About Me</h3>
-            <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.4" }}>
-              {optionalSections.about.content}
-            </p>
-          </div>
-        )}
-
-      {optionalSections &&
-        optionalSections.testimonials &&
-        optionalSections.testimonials.enabled &&
-        optionalSections.testimonials.items &&
-        optionalSections.testimonials.items.length > 0 && (
-          <div
-            className="testimonials-section"
-            style={{ padding: "20px", borderTop: "1px solid #eee" }}
-          >
-            <h3 style={{ margin: "0 0 15px 0", fontSize: "16px" }}>
-              What Clients Say
-            </h3>
-            {optionalSections.testimonials.items.map((testimonial, index) => (
-              <div key={testimonial.id} style={{ marginBottom: "15px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "5px",
-                  }}
-                >
-                  <span style={{ fontSize: "12px", marginRight: "10px" }}>
-                    {"⭐".repeat(testimonial.rating)}
-                  </span>
-                  <span style={{ fontSize: "12px", fontWeight: "bold" }}>
-                    {testimonial.author}
-                  </span>
+            <div className="preview-content d-flex justify-content-center">
+              {hasContent() ? (
+                <div className="preview-card">
+                  <DoggeCardDisplay card={currentCard} isPreview={true} />
                 </div>
-                <p
-                  style={{ margin: "0", fontSize: "14px", fontStyle: "italic" }}
-                >
-                  "{testimonial.text}"
-                </p>
-              </div>
-            ))}
+              ) : (
+                <div className="empty-preview-state text-center p-5 rounded-4 shadow-sm border">
+                  <div className="text-muted mb-4">
+                    <Eye size={64} className="opacity-50" />
+                  </div>
+                  <h3 className="h4 fw-bold mb-3">No Content to Preview</h3>
+                  <p className="text-muted mb-4 lead">
+                    Your card is empty. Please add some content in the builder
+                    to see a preview.
+                  </p>
+                  <button
+                    onClick={() => navigate("/builder")}
+                    className="btn btn-primary btn-lg d-flex align-items-center gap-2 mx-auto"
+                  >
+                    <Eye size={20} />
+                    Go to Builder
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </div>
+      </div>
     </div>
   );
 };
